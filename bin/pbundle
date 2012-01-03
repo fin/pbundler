@@ -20,7 +20,7 @@ class PBFile:
             return root
         up = os.path.abspath(os.path.join(root, '..'))
         if up == root: return None
-        return find_upwards(fn, up)
+        return PBFile.find_upwards(fn, up)
 
 REQUIREMENTS = 'requirements.txt'
 REQUIREMENTS_LAST = 'requirements.last'
@@ -40,10 +40,7 @@ class PBundle:
 
     @staticmethod
     def find_basepath():
-        path = PBFile.find_upwards(REQUIREMENTS)
-        if path is None:
-            raise PBBasepathNotFound
-        return path
+        return PBFile.find_upwards(REQUIREMENTS)
 
     def ensure_paths(self):
         if not os.path.exists(self.workpath):
