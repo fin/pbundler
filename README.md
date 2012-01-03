@@ -53,5 +53,5 @@ TODO
 * Split library code away
 * easy\_install-able egg
 * Get rid of os.system
-
+* Really remove all no longer needed packages from virtualenv
 
