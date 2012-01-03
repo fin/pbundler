@@ -5,6 +5,8 @@ Simplifies virtualenv and pip usage.
 
 Aims to be compatible with all existing projects already carrying a "requirements.txt" in their source.
 
+Inspired by http://gembundler.com/
+
 Howto
 -----
 
