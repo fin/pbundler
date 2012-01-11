@@ -23,5 +23,6 @@ setup(
     license = "MIT",
     keywords = "bundler bundle pbundler pbundle",
     url = "http://github.com/zeha/pbundler/",
+    download_url = "https://github.com/zeha/pbundler/downloads",
 )
 
