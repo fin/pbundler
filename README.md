@@ -10,8 +10,7 @@ Inspired by http://gembundler.com/
 Howto
 -----
 
-* Install virtualenv: easy_install virtualenv
-* Put bin/pbundle\* into your PATH.
+* easy\_install pbundler
 * cd into your project path
 * Run pbundle. It will install your project's dependencies into a fresh virtualenv.
 
@@ -50,8 +49,7 @@ Replace the shebang with "/usr/bin/env pbundle-py". Example:
 TODO
 ----
 
-* Split library code away
-* easy\_install-able egg
-* Get rid of os.system
 * Really remove all no longer needed packages from virtualenv
+* Get rid of os.system
+* Reorganize library code
 

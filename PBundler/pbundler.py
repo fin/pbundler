@@ -170,4 +170,3 @@ class PBCli():
     def cmd_py(self, args):
         self.pb.run(["python"] + args, verbose=False)
 
-PBCli().run(sys.argv)
