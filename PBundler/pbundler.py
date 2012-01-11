@@ -98,6 +98,10 @@ class PBundle:
     def upgrade(self):
         self.run(["pip", "install", "--upgrade", "-r", os.path.join(self.basepath, REQUIREMENTS)])
 
+class PBCliError(Exception):
+    def __init__(self, message):
+        Exception.__init__(self, message)
+
 class PBCli():
     def __init__(self):
         self._pb = None
@@ -107,32 +111,30 @@ class PBCli():
         if not self._pb:
             basepath = PBundle.find_basepath()
             if not basepath:
-                print "Could not find requirements.txt in path from here to root."
-                self.print_usage()
-                sys.exit(1)
+                raise PBCliError("Could not find requirements.txt in path from here to root.")
             self._pb = PBundle(basepath)
         return self._pb
 
-    def run(self, argv):
+    def handle_args(self, argv):
         args = argv[1:]
         command = "install"
         if args:
             command = args.pop(0)
-        if command == "install":
-            self.cmd_install()
-        elif command == "upgrade":
-            self.cmd_upgrade()
-        elif command == "init":
-            self.cmd_init()
-        elif command == "run":
-            self.cmd_run(args)
-        elif command == "py":
-            self.cmd_py(args)
-        elif command == "help":
-            self.print_usage()
+        if 'cmd_' + command in PBCli.__dict__:
+            return PBCli.__dict__['cmd_'+command](self, args)
         else:
-            self.print_usage()
-            sys.exit(1)
+            raise PBCliError("Unknown command \"%s\"" % (command,))
+
+    def run(self, argv):
+        try:
+            return self.handle_args(argv)
+        except PBCliError, e:
+            print "E: " + str(e)
+            return 1
+        except Exception, e:
+            print "E: Internal error in pbundler:\n"
+            print "  ", e
+            return 120
 
     def print_usage(self):
         print "pbundle                - Copyright 2012 Christian Hofstaedtler"
@@ -144,23 +146,25 @@ class PBCli():
         print "  pbundle run program  - Run \"program\" in activated virtualenv"
         print "  pbundle py args      - Run activated python with args"
 
-    def cmd_init(self):
+    def cmd_help(self, args):
+        self.print_usage()
+
+    def cmd_init(self, args):
         # can't use PBundle here
         if os.path.exists(REQUIREMENTS):
-            print "Cowardly refusing, as %s already exists here." % (REQUIREMENTS,)
-            sys.exit(1)
+            raise PBCliError("Cowardly refusing, as %s already exists here." % (REQUIREMENTS,))
         with open(REQUIREMENTS, "w") as f:
             f.write("# pbundle MAGIC\n")
             f.write("#pbundle>=0\n")
             f.write("\n")
 
-    def cmd_install(self):
+    def cmd_install(self, args):
         if self.pb.requirements_changed():
             self.pb.uninstall_removed()
             self.pb.install()
             self.pb.save_requirements()
 
-    def cmd_upgrade(self):
+    def cmd_upgrade(self, args):
         self.pb.uninstall_removed()
         self.pb.upgrade()
 
@@ -169,4 +173,3 @@ class PBCli():
 
     def cmd_py(self, args):
         self.pb.run(["python"] + args, verbose=False)
-
