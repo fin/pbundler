@@ -4,6 +4,7 @@ setup(
     name = "pbundler",
     version = "0.0.1",
     packages = find_packages(),
+    zip_safe = False,
     install_requires = ['virtualenv','distribute'],
     package_data = {
         '': ['*.md'],
