@@ -49,6 +49,8 @@ Replace the shebang with "/usr/bin/env pbundle-py". Example:
 TODO
 ----
 
+* Build inventory from what is installed, instead of requirements.last file
+* Handle failed egg installs
 * Really remove all no longer needed packages from virtualenv
 * Get rid of os.system
 * Reorganize library code
