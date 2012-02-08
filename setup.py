@@ -5,7 +5,7 @@ setup(
     version = "0.0.1",
     packages = find_packages(),
     zip_safe = False,
-    install_requires = ['virtualenv','distribute'],
+    install_requires = ['virtualenv','distribute', 'pip'],
     package_data = {
         '': ['*.md'],
     },

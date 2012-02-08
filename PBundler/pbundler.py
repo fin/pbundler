@@ -2,8 +2,11 @@
 import json
 import hashlib
 import os, sys, fnmatch
-import pkg_resources
+import pip.req
+from pip.exceptions import InstallationError
 import time
+
+pip.version_control() # initialize vcs support
 
 class PBFile:
     @staticmethod
@@ -28,6 +31,12 @@ REQUIREMENTS_LAST = 'requirements.last'
 class PBBasepathNotFound(Exception):
     pass
 
+class FakeOptionsClass(object):
+    def __hasattr__(self, name):
+        return True
+    def __getattr__(self,name):
+        return None
+
 class PBundle:
     def __init__(self, basepath):
         self.basepath = basepath
@@ -50,27 +59,31 @@ class PBundle:
         if not os.path.exists(os.path.join(self.virtualenvpath, 'bin')):
             os.system("virtualenv --no-site-packages " + self.virtualenvpath + " 2>&1")
 
-    def _parse_requirements(self, text):
-        r = {}
-        if text is None: return r
-        for line in text.split("\n"):
-            line = line.strip()
-            if line.startswith('#'): continue
-            if line == "": continue
-            req = pkg_resources.Requirement.parse(line)
-            r[req.project_name] = str(req)
-        return r
+
+    def _parse_requirements(self, filename):
+        reqs = {}
+        try:
+            try:
+                for req in pip.req.parse_requirements(os.path.join(self.basepath, filename), options=FakeOptionsClass()):
+                    reqs[req.name] = req
+            except InstallationError, e:
+                pass
+        except Exception, e:
+            import traceback
+            traceback.print_exc(e)
+        return reqs
+
 
     @property
     def requirements(self):
         if not self._requirements:
-            self._requirements = self._parse_requirements(PBFile.read(self.basepath, REQUIREMENTS))
+            self._requirements = self._parse_requirements(REQUIREMENTS)
         return self._requirements
 
     @property
     def requirements_last(self):
         if not self._requirements_last:
-            self._requirements_last = self._parse_requirements(PBFile.read(self.workpath, REQUIREMENTS_LAST))
+            self._requirements_last = self._parse_requirements(REQUIREMENTS_LAST)
         return self._requirements_last
 
     def requirements_changed(self):
