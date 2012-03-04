@@ -60,7 +60,7 @@ start-unicorn.sh:
 
     #!/bin/bash
     cd /srv/app/flaskr
-    PYTHONPATH=/srv/app/wsgi pbundle run gunicorn -w 5 -b 127.0.0.1:4000 -n flaskrprod flaskr:app
+    PYTHONPATH=/srv/app/wsgi exec pbundle run gunicorn -w 5 -b 127.0.0.1:4000 -n flaskrprod flaskr:app
 
 
 TODO
