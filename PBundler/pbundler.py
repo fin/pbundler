@@ -96,6 +96,15 @@ class PBundle:
                 f.write("%s\n" % r)
 
     def run(self, command, verbose=True):
+        if verbose:
+            print "Running \"%s\" ..." % (' '.join(command),)
+        if 'PYTHONHOME' in os.environ:
+            del os.environ['PYTHONHOME']
+        os.environ['VIRTUAL_ENV'] = self.virtualenvpath
+        os.environ['PATH'] = os.path.join(self.virtualenvpath, "bin") + ':' + os.environ['PATH']
+        os.execvp(command[0], command)
+
+    def _call_program(self, command, verbose=True):
         cmdline = ' '.join(command)
         if verbose: print "Running \"%s\" ..." % (cmdline,)
         os.system(". " + self.virtualenvpath + "/bin/activate; PBUNDLE_REQ='" + self.basepath + "'; " + cmdline)
@@ -103,13 +112,13 @@ class PBundle:
     def uninstall_removed(self):
         to_remove = set(self.requirements_last.keys()) - set(self.requirements.keys())
         for p in to_remove:
-            self.run(["pip", "uninstall", p])
+            self._call_program(["pip", "uninstall", p])
 
     def install(self):
-        self.run(["pip", "install", "-r", os.path.join(self.basepath, REQUIREMENTS)])
+        self._call_program(["pip", "install", "-r", os.path.join(self.basepath, REQUIREMENTS)])
 
     def upgrade(self):
-        self.run(["pip", "install", "--upgrade", "-r", os.path.join(self.basepath, REQUIREMENTS)])
+        self._call_program(["pip", "install", "--upgrade", "-r", os.path.join(self.basepath, REQUIREMENTS)])
 
 class PBCliError(Exception):
     def __init__(self, message):
