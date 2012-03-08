@@ -109,12 +109,11 @@ class PBundle:
     def envfile(self, verbose=True):
         ef = {}
         try:
-            import json
-            ef = json.loads(open(os.path.join(self.workpath, "environment.json")).read())
+            execfile(os.path.join(self.workpath, "environment.py"), {}, ef)
         except IOError, e:
             pass # ignore non-existence of environment.json
         except Exception, e:
-            print 'environment.json: %s' % e
+            print 'environment.py: %s' % e
         return ef
 
 
